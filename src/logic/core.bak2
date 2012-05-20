@@ -1,0 +1,96 @@
+(ns logic.core
+  (:refer-clojure :exclude [==])
+  (:use [clojure.core.logic]
+        [midje.sweet]))
+
+
+(defn relation-name [prefix-symbol suffix-key]
+  )
+
+(fact 'f
+  (let [actual (relation-name 'prefix :suffix)]
+    actual => symbol?
+    actual => 'prefix-suffix))
+
+(defmacro data [type-name & examples]
+  )
+        
+(data animal
+      {:name "fred", :species :equine}
+      {:name "betty" :species :bovine})
+
+
+;; (fact "data statements generate relations and facts"
+;;   (run* [q] (animal-name q)) => (just "fred" "betty" :in-any-order))
+
+
+
+;; (defrel animal Name)
+;; (fact animal "fred")
+;; (fact animal "betty")
+
+;; (defrel procedure Name)
+;; (fact procedure "hoof trim")
+;; (fact procedure "superovulation")
+
+;; (defrel animal-species Name Species)
+;; (fact animal-species "fred" :equine)
+;; (fact animal-species "betty" :bovine)
+
+;; (defrel procedure-species Name Species)
+;; (fact procedure-species "hoof trim" :equine)
+;; (fact procedure-species "superovulation", :bovine)
+
+;; (defrel date Name)
+;; (fact date "1959/10/23")
+;; (fact date "1960/02/19")
+;; (fact date "1994/02/23")
+;; (fact date "1995/07/03")
+
+;; (defn compatible-o [animal-name procedure-name q]
+;;   (fresh [species]
+;;          (animal-species animal-name species)
+;;          (procedure-species procedure-name species)
+;;          (== (list animal-name procedure-name) q))) 
+
+;; (defn force-compatible-o [animal-name procedure-name]
+;;   (fresh [species]
+;;          (animal-species animal-name species)
+;;          (procedure-species procedure-name species)))
+
+
+;; (defn reservation-o [q]
+;;   (fresh [a1 p1 d]
+;;          (== `{:constructs :reservation
+;;                :date ~d
+;;                :groups ( (~a1 ~p1))}
+;;              q)
+;;          (date d)
+;;          (animal a1)
+;;          (procedure p1)
+;;          (force-compatible-o a1 p1)))
+
+        
+;; ;; (one-use-reservation)
+;; ;; (one-use-reservation :animal "fred")
+;; ;; (one-use-reservation :procedure "whatever")
+
+
+
+
+;; ;; (defn compatible-o [animal-name procedure-name q]
+;; ;;   (animal animal-name)
+;; ;;   (procedure procedure-name)
+;; ;;   (fresh [species]
+;; ;;          (== (animal-species animal-name) (procedure-species procedure-name)))
+;; ;;   (== (list animal-name procedure-name) q)) 
+  
+  
+  
+;; ;; (defn reservation-o [who what when q]
+;; ;;   (all 
+;; ;;    (animal who)
+;; ;;    (procedure what)
+;; ;;    (force-compatible-o who what)
+;; ;;    (date when)
+;; ;;    (== (list :reservation who what when) q)))
