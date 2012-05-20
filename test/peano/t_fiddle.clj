@@ -18,29 +18,6 @@
      (animal-species-o animal species)
      (procedure-species-o procedure species)))
 
-
-(defmacro procedure-applies-to-animal-none    []
-  `(l/run* [q#] (l/fresh [animal# procedure#]
-                       (procedure-applies-to-animal-o procedure# animal#)
-                       (l/== [animal# procedure#] q#))))
-
-(procedure-applies-to-animal-none)
-
-(defmacro procedure-applies-to-animal-animal [animal]
-  `(l/run* [q#] (l/fresh [animal# procedure#]
-                     (procedure-applies-to-animal-o procedure# animal#)
-                     (l/== animal# ~animal)
-                     (l/== procedure# q#))))
-
-(procedure-applies-to-animal-animal "betty")
-
-
-(defmacro procedure-applies-to-animal-both [procedure animal]
-  `(not (empty? (l/run* [q#] (l/fresh [animal# procedure#]
-                     (procedure-applies-to-animal-o procedure# animal#)
-                     (l/== ~animal animal#)
-                     (l/== ~procedure procedure#))))))
-
 (defn procedure-applies-to-animal??*
   [desired-count &
    {:keys [procedure animal]
@@ -78,3 +55,28 @@
 (defmacro first-procedure-applies-to-animal?? [& args]
   `(first ~( (partial apply procedure-applies-to-animal??* 1) args)))
 
+(def full-hank-or-full-betty (chatty-checker [actual]
+   (or (= ["superovulation" "betty"] actual)
+       (= ["hoof trim" "hank"] actual))))
+
+(fact "trying to match everything"
+  (procedure-applies-to-animal??) => (just ["superovulation" "betty"]
+                                           ["hoof trim" "hank"]
+                                           :in-any-order)
+  (first (procedure-applies-to-animal?? 1)) => full-hank-or-full-betty
+  (first-procedure-applies-to-animal??) => full-hank-or-full-betty)
+
+
+(def hank-or-betty (chatty-checker [actual]
+   (or (= "betty" actual)
+       (= "hank" actual))))
+
+(fact "leaving only one relation unspecified "
+  (procedure-applies-to-animal?? :animal "hank") => ["hoof trim"]
+  (first (procedure-applies-to-animal?? 1 :procedure "superovulation")) => hank-or-betty
+  (first-procedure-applies-to-animal?? :procedure "superovulation") => hank-or-betty)
+
+(fact "specifying all relations"
+  (procedure-applies-to-animal?? :animal "hank"  :procedure "superovulation") => falsey
+  (procedure-applies-to-animal?? :animal "hank"  :procedure "hoof trim") => truthy)
+  
