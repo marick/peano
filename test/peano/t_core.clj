@@ -14,25 +14,25 @@
   (l/run* [q] (animal-species-o q :bovine)) => (just "betty"))
 
 (fact "data accessors are created"
-   (animal-data?? "betty") => {:name "betty" :species :bovine}
-   (animal-data?? "NOT PRESENT") => nil
-   (animal-data??) =future=> (just {:name "betty" :species :bovine}
+   (animal-data "betty") => {:name "betty" :species :bovine}
+   (animal-data "NOT PRESENT") => nil
+   (animal-data) =future=> (just {:name "betty" :species :bovine}
                                  {:name "hank" :species :equine}))
 
 (defchecker betty-or-hank [actual]
   (some #{actual} ["hank" "betty"])) 
 
-(future-fact "name selectors are created"
-  (animal-name?? "betty") => "betty"
-  (one (animal-name??)) => betty-or-hank
-  (n 2 (animal-name??)) => (just "hank" "betty" :in-any-order)
-  (animal-name??) => (just "hank" "betty" :in-any-order))
+;; (future-fact "name selectors are created"
+;;   (animal-name?? "betty") => "betty"
+;;   (one (animal-name??)) => betty-or-hank
+;;   (n 2 (animal-name??)) => (just "hank" "betty" :in-any-order)
+;;   (animal-name??) => (just "hank" "betty" :in-any-order))
 
-(future-fact "other selectors are created"
-  (animal-species?? :name "betty" :species :bovine) => truthy
-  (animal-species?? :name "betty") => [:bovine]
-  (animal-species?? :species :bovine) => ["betty"]
-  (animal-species??) => ["betty"]
+;; (future-fact "other selectors are created"
+;;   (animal-species?? :name "betty" :species :bovine) => truthy
+;;   (animal-species?? :name "betty") => [:bovine]
+;;   (animal-species?? :species :bovine) => ["betty"]
+;;   (animal-species??) => ["betty"]
 
 
 ;; Bindings are obeyed
