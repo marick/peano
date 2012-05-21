@@ -10,8 +10,28 @@
       {:name "hank" :species :equine})
 
 (data [procedure :by :name]
-      {:name "hoof trim", :species :equine}
-      {:name "superovulation", :species :bovine})
+      {:name "hoof trim", :species-rule :equine-only}
+      {:name "superovulation", :species-rule :bovine-only}
+      {:name "exam", :species-rule :all}
+      )
+
+(defn procedure-species-o [procedure species]
+  (l/fresh [rule]
+    (procedure-species-rule-o procedure rule)
+    (l/conde ( (l/== species :equine) (l/== rule :equine-only))
+             ( (l/== species :bovine) (l/== rule :bovine-only))
+             ( (l/== rule :all) ))))
+
+(fact "can find procedure species pair"
+  (l/run* [q] (procedure-species-o "superovulation" q)) => [:bovine]
+  (l/run* [p] (procedure-species-o p :equine)) => (just "hoof trim" "exam") :in-any-order
+  (l/run* [q]
+    (l/fresh [p s]
+      (procedure-species-o p s)
+      (l/== [p s] q)))
+  => (just ["hoof trim" :equine] ["exam" '_.0] ["superovulation" :bovine] :in-any-order))
+
+
 
 (defn procedure-applies-to-animal-o [procedure animal]
   (l/fresh [species]
@@ -62,6 +82,8 @@
 (fact "trying to match everything"
   (procedure-applies-to-animal??) => (just ["superovulation" "betty"]
                                            ["hoof trim" "hank"]
+                                           ["exam" "betty"]
+                                           ["exam" "hank"]
                                            :in-any-order)
   (first (procedure-applies-to-animal?? 1)) => full-hank-or-full-betty
   (first-procedure-applies-to-animal??) => full-hank-or-full-betty)
@@ -72,11 +94,13 @@
        (= "hank" actual))))
 
 (fact "leaving only one relation unspecified "
-  (procedure-applies-to-animal?? :animal "hank") => ["hoof trim"]
-  (first (procedure-applies-to-animal?? 1 :procedure "superovulation")) => hank-or-betty
+  (procedure-applies-to-animal?? :animal "hank") => (just "hoof trim" "exam" :in-any-order)
+  (procedure-applies-to-animal?? 1 :procedure "superovulation") => #(hank-or-betty (first %))
   (first-procedure-applies-to-animal?? :procedure "superovulation") => hank-or-betty)
 
 (fact "specifying all relations"
   (procedure-applies-to-animal?? :animal "hank"  :procedure "superovulation") => falsey
   (procedure-applies-to-animal?? :animal "hank"  :procedure "hoof trim") => truthy)
-  
+
+
+
