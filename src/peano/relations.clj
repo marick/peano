@@ -1,57 +1,57 @@
 (ns peano.relations
-  (:require [clojure.core.logic :as l]))
+  (:require [clojure.core.logic :as l])
+  (:use peano.tokens))
 
-(defn relation-symbol [prefix-symbol suffix-key]
-  (symbol (str (name prefix-symbol) "-" (name suffix-key) "-o")))
+(defn to-make-did-relation [name-in-query-form did-key]
+  `(l/defrel ~name-in-query-form ~did-key))
 
-(defn typelike-symbol [key]
-  ;; Why can I not create a symbol from a key?
-  key)
-
-(defn index-relation [relation-symbol field-name]
-  `(l/defrel ~relation-symbol ~field-name))
-
-(defn index-facts [relation-name values]
-  (map (fn [value] `(l/fact ~relation-name ~value))
+(defn to-add-did-facts [name-in-query-form values]
+  (map (fn [value] `(l/fact ~name-in-query-form ~value))
        values))
 
-(defn binary-relation [relation-symbol index-name field-name]
-  `(l/defrel ~relation-symbol ~index-name ~field-name))
+(defn did-do-form [relation-name did-key instances]
+  (let [name-in-query-form (query-symbol relation-name)
+        relation-did-name (typelike-symbol did-key)]
+    `(do ~(to-make-did-relation name-in-query-form relation-did-name)
+         ~@(to-add-did-facts name-in-query-form (map did-key instances)))))
 
-(defn binary-facts [relation-name index-values field-values]
-  (map (fn [index-value field-value]
-         `(l/fact ~relation-name ~index-value ~field-value))
-       index-values
+
+(defn to-make-binary-relation [name-in-query-form did-key field-name]
+  `(l/defrel ~name-in-query-form ~did-key ~field-name))
+
+(defn to-add-binary-facts [name-in-query-form did-values field-values]
+  (map (fn [did-value field-value]
+         `(l/fact ~name-in-query-form ~did-value ~field-value))
+       did-values
        field-values))
 
-(defn index-do-form [prefix index-key instances]
-  (let [relation-symbol (relation-symbol prefix index-key)
-        relation-index-name (typelike-symbol index-key)]
-    `(do ~(index-relation relation-symbol relation-index-name)
-         ~@(index-facts relation-symbol (map index-key instances)))))
-
-(defn other-do-form [prefix index-key other-key instances]
-  (let [relation-symbol (relation-symbol prefix other-key)
-        relation-index-name (typelike-symbol index-key)
+(defn binary-do-form [relation-name did-key other-key instances]
+  (let [name-in-query-form (query-symbol relation-name other-key)
+        relation-did-name (typelike-symbol did-key)
         relation-argname (typelike-symbol other-key)]
-    `(do ~(binary-relation relation-symbol relation-index-name relation-argname)
-         ~@(binary-facts relation-symbol
-                         (map index-key instances)
-                         (map other-key instances)))))
+    `(do ~(to-make-binary-relation name-in-query-form relation-did-name relation-argname)
+         ~@(to-add-binary-facts name-in-query-form
+                             (map did-key instances)
+                             (map other-key instances)))))
 
-(defn data-accessor [prefix index-key instances]
-  `(defn ~(symbol (str (name prefix) "-data")) [index-value#]
-     (first (filter #(= index-value# (get % ~index-key))
-                    (vector ~@instances)))))
 
-(defn data* [index-description instances]
-  (let [prefix (first index-description)
-        index-key (last index-description)
-        other-keys (keys (dissoc (first instances) index-key))
-        index-do-form (index-do-form prefix index-key instances)
-        remaining-forms (map (fn  [other-key]
-                               (other-do-form prefix index-key other-key instances))
-                             other-keys)]
-    `(do ~index-do-form
+
+(defn data-accessor [relation-name did-key instances]
+  (let [mapping (group-by did-key instances)]
+    `(defn ~(data-symbol relation-name)
+       ([did-value#] (first (~mapping did-value#)))
+       ([] '~instances))))
+
+
+
+(defn data* [did-description instances]
+  (let [prefix (first did-description)
+        did-key (last did-description)
+        all-keys (keys (first instances))
+        did-do-form (did-do-form prefix did-key instances)
+        remaining-forms (map (fn [other-key]
+                               (binary-do-form prefix did-key other-key instances))
+                             all-keys)]
+    `(do ~did-do-form
          ~@remaining-forms
-         ~(data-accessor prefix index-key instances))))
+         ~(data-accessor prefix did-key instances))))

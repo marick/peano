@@ -2,22 +2,20 @@
   (:require [clojure.core.logic :as l])
   (:use midje.sweet
         peano.relations))
-         
-(fact "Index relations"
-  (index-relation 'animal-name-o :name) =>
-  '(clojure.core.logic/defrel animal-name-o :name))
-  
-(fact "Index facts"
-  (index-facts 'animal-name-o ["Bessie"])
-  => '[(clojure.core.logic/fact animal-name-o "Bessie")])
 
-(fact "Binary relations"
-  (binary-relation 'animal-species-o :name :species) =>
-  '(clojure.core.logic/defrel animal-species-o :name :species))
-  
-(fact "Binary facts"
-  (binary-facts 'animal-species-o ["Bessie"] [:bovine])
-  => '[(clojure.core.logic/fact animal-species-o "Bessie" :bovine)])
+;; The more complete tests are in t-core.
 
-;; (let [foo 33]
-;;   (clojure.pprint/pprint (data* 'animal [{:a 1 :b even? :c foo}])))
+;; For some reason, this eval doesn't work when run inside a fact.
+(eval (did-do-form 'animal :name [{:name "bess"}]))
+(fact "can make the special 'here is how I refer to data' (did) query-form"
+  (l/run* [q] (animal?? q)) => ["bess"])
+
+(eval (binary-do-form 'animal :name :hooves [{:name "bess", :hooves 4}]))
+(fact "can make binary query-forms"
+  (l/run* [q] (animal-hooves?? "bess" q)) => [4])
+
+
+(eval (data-accessor 'animal :name [{:name "bess", :hooves 4}]))
+(fact "can make the data-accessor-by-name form"
+  (animal-data "bess") => {:name "bess", :hooves 4})
+
