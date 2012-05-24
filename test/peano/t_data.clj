@@ -1,7 +1,7 @@
-(ns peano.t-relations
+(ns peano.t-data
   (:require [clojure.core.logic :as l])
   (:use midje.sweet
-        peano.relations))
+        peano.data))
 
 ;; The more complete tests are in t-core.
 

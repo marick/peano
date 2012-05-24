@@ -1,4 +1,4 @@
-(ns peano.relations
+(ns peano.data
   (:require [clojure.core.logic :as l])
   (:use peano.tokens))
 
