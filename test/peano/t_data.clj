@@ -19,3 +19,12 @@
 (fact "can make the data-accessor-by-name form"
   (animal-data "bess") => {:name "bess", :hooves 4})
 
+
+(eval (did-do-form 'three-args :name [{:name "bess" :foo 1 :bar 2}]))
+(eval (binary-do-form 'three-args :name :foo [{:name "bess", :foo 1 :bar 2}]))
+(fact "arguments to `data` are stored"
+  (:peano-arglist (meta #'three-args??)) => [:name]
+  (:peano-did (meta #'three-args??)) => :name
+  (:peano-arglist (meta #'three-args-foo??)) => [:name :foo]
+  (:peano-did (meta #'three-args-foo??)) => :name)
+  

@@ -4,6 +4,8 @@
         clojure.pprint
         peano.core))
 
+;;;                             Constructing data and query functions.
+
 (data [animal :by :name]
       {:name "betty" :species :bovine}
       {:name "hank" :species :equine})
@@ -22,8 +24,6 @@
    (animal-data) => (just {:name "betty" :species :bovine}
                           {:name "hank" :species :equine}))
 
-
-
 ;; Bindings are obeyed
 (let [value 33
       who "betty"]
@@ -38,3 +38,27 @@
   ((first (l/run* [q] (bindinged-fun?? "hank" q))) 34) => true
   (bindinged-data "betty") => {:name "betty" :species 33 :fun odd?})
 
+
+
+;;;                             Selector functions
+
+(comment
+     
+(make-selector-functions animal)
+
+(future-fact "The list of dids can be returns"
+  (animals?>) => (just "hank" "betty" :in-any-order))
+
+(future-fact "selectors apply to two-valued properties with all left blank"
+  (animal-species?>) => (just ["hank" :equine] ["betty" :bovine] :in-any-order))
+
+(future-fact "an unspecified field drives the results"
+  (animal-species?> :species :bovine) => ["betty"]
+  (animal-species?> :name "betty") => [:bovine])
+
+(future-fact "just for fun, you can a boolean result"
+  (animal-species?> :species :bovine :name "betty") => truthy
+  (animal-species?> :species :bovine :name "hank") => falsey
+  (animal-species?> :species :querty :name "betty") => falsey)
+             
+)
