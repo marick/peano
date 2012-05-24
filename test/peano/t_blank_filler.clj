@@ -81,3 +81,20 @@
   => (contains {:filled-in '["animal-0" b]
                 :logic-vars-needed '["animal-0" b]
                 :extra-restrictions '["hank"]}))
+
+(defn build-run* [reservation ab-pair extra-clauses]
+  (let [body `( (l/== (cons :reservation ~reservation) ~'q)
+                (permitted?? ~@ab-pair)
+                ~@extra-clauses)]
+    `(l/run false [~'q] (l/fresh ~ab-pair ~@body))))
+
+;; (make-reservation [:reservation [a b]]) 
+;; (make-reservation [:reservation [a b]] (l/== a b)) 
+
+(defmacro make-reservation [reservation & manual-extra-clauses]
+  (let [constructed-reservation reservation
+        logic-vars '[a b]
+        extra-clauses-from-reservation '[(l/== a "hank")]]
+    (build-run* constructed-reservation logic-vars
+                (concat manual-extra-clauses extra-clauses-from-reservation))))
+
