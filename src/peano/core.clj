@@ -7,6 +7,6 @@
 (defmacro data [data-type & data-maps]
   (data* data-type data-maps))
 
-(defmacro make-selector-functions [relation]
-  (make-selector-functions* relation))
+(defmacro make-selector-functions [relation did]
+  (make-selector-functions* relation did))
   

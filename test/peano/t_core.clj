@@ -40,25 +40,21 @@
 
 
 
-;;;                             Selector functions
+;;;                             Key-driven selector functions
 
-(make-selector-functions animal)
+(make-selector-functions animal :name)
+(prn (macroexpand '(animal?> :species :bovine :name 'foo)))
 
-(fact "The list of dids can be returns"
+(fact "The list of dids can be returned"
   (animal?>) => (just "hank" "betty" :in-any-order))
 
-(comment
+(fact "an unspecified field drives the results"
+  (animal?> :species :bovine) => ["betty"]
+  (animal?> :species :travelogue) => []
+  (animal?> :name "betty") => ["betty"]) ; kind of silly
 
-  (future-fact "selectors apply to two-valued properties with all left blank"
-  (animal-species?>) => (just ["hank" :equine] ["betty" :bovine] :in-any-order))
+(fact "both fields produces a boolean result"
+  (animal?> :species :bovine :name "betty") => truthy
+  (animal?> :species :bovine :name "sandy") => falsey
+  (animal?> :species :travelogue :name "betty") => falsey)
 
-(future-fact "an unspecified field drives the results"
-  (animal-species?> :species :bovine) => ["betty"]
-  (animal-species?> :name "betty") => [:bovine])
-
-(future-fact "just for fun, you can a boolean result"
-  (animal-species?> :species :bovine :name "betty") => truthy
-  (animal-species?> :species :bovine :name "hank") => falsey
-  (animal-species?> :species :querty :name "betty") => falsey)
-             
-)

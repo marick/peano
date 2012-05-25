@@ -20,3 +20,8 @@
 
 (defn data-symbol [symbol-or-string]
   (symbol (str (name symbol-or-string) "-data")))
+
+(def key-to-lvar (comp symbol name))
+
+(defn keys-to-lvars [keys]
+  (map key-to-lvar keys))

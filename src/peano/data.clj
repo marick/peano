@@ -2,17 +2,8 @@
   (:require [clojure.core.logic :as l])
   (:use peano.tokens))
 
-(defn remember-args! [symbol-naming-var did-key all-keys]
-  (alter-meta! (intern *ns* symbol-naming-var)
-               merge
-               {:peano-arglist all-keys
-                :peano-did did-key}))
-  
-
 (defn to-make-did-relation [name-in-query-form did-key]
-  `(do
-     (l/defrel ~name-in-query-form ~did-key)
-     (remember-args! '~name-in-query-form ~did-key [~did-key])))
+  `(l/defrel ~name-in-query-form ~did-key))
 
 (defn to-add-did-facts [name-in-query-form values]
   (map (fn [value] `(l/fact ~name-in-query-form ~value))
@@ -26,9 +17,7 @@
 
 
 (defn to-make-binary-relation [name-in-query-form did-key field-name]
-  `(do
-     (l/defrel ~name-in-query-form ~did-key ~field-name)
-     (remember-args! '~name-in-query-form ~did-key [~did-key ~field-name])))
+  `(l/defrel ~name-in-query-form ~did-key ~field-name))
   
 
 (defn to-add-binary-facts [name-in-query-form did-values field-values]
