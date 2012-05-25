@@ -42,19 +42,28 @@
 
 ;;;                             Key-driven selector functions
 
-(make-selector-functions animal :name)
-(prn (macroexpand '(animal?> :species :bovine :name 'foo)))
+(data [procedure :by :name]
+      {:name "hoof trim" :species-rule :equine-only :days-delay 0}
+      {:name "superovulation" :species-rule :bovine-only :days-delay 90}
+      {:name "physical exam" :species-rule :all :days-delay 0})
+
+(make-did-selector procedure)
 
 (fact "The list of dids can be returned"
-  (animal?>) => (just "hank" "betty" :in-any-order))
+  (procedure?>) => (just "hoof trim" "superovulation" "physical exam" :in-any-order))
 
-(fact "an unspecified field drives the results"
-  (animal?> :species :bovine) => ["betty"]
-  (animal?> :species :travelogue) => []
-  (animal?> :name "betty") => ["betty"]) ; kind of silly
+(fact "a key-value pair can narrow the returned results"
+  (procedure?> :species-rule :bovine-only) => ["superovulation"]
+  (procedure?> :species-rule :travelogue) => []
+  (procedure?> :days-delay 0) => ["hoof trim" "physical exam"]
+  (procedure?> :name "physical exam") => ["physical exam"]) ; kind of silly
 
-(fact "both fields produces a boolean result"
-  (animal?> :species :bovine :name "betty") => truthy
-  (animal?> :species :bovine :name "sandy") => falsey
-  (animal?> :species :travelogue :name "betty") => falsey)
+(fact "more than one field can be used"
+  (procedure?> :species-rule :bovine-only :days-delay 90) => ["superovulation"]
+  (procedure?> :species-rule :bovine-only :days-delay 900000) => []
+  (procedure?> :species-rule :human :days-delay 90) => [])
+
+(fact "bindings are obeyed"
+  (let [days-delay 90]
+    (procedure?> :species-rule :bovine-only :days-delay days-delay) => ["superovulation"]))
 
