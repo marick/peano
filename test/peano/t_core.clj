@@ -42,14 +42,14 @@
 
 ;;;                             Selector functions
 
-(comment
-     
 (make-selector-functions animal)
 
-(future-fact "The list of dids can be returns"
-  (animals?>) => (just "hank" "betty" :in-any-order))
+(fact "The list of dids can be returns"
+  (animal?>) => (just "hank" "betty" :in-any-order))
 
-(future-fact "selectors apply to two-valued properties with all left blank"
+(comment
+
+  (future-fact "selectors apply to two-valued properties with all left blank"
   (animal-species?>) => (just ["hank" :equine] ["betty" :bovine] :in-any-order))
 
 (future-fact "an unspecified field drives the results"
