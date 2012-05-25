@@ -5,10 +5,13 @@
 
 (defn generate-run-form [base-relation kvs]
   (let [q (gensym "q")
+        pairs (if (map? (first kvs))
+                (into [] (first kvs))
+                (partition 2 kvs))
         selector-for-did `(~(query-symbol base-relation) ~q)
         narrowing-selectors (map (fn [[key value]]
                                    `( ~(query-symbol base-relation key) ~q ~value))
-                                 (partition 2 kvs))]
+                                 pairs)]
   `(l/run false [~q] ~selector-for-did ~@narrowing-selectors)))
 
 (defn make-did-selector* [base-relation]

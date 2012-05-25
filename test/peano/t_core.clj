@@ -40,7 +40,7 @@
 
 
 
-;;;                             Key-driven selector functions
+;;;                             DId selectors
 
 (data [procedure :by :name]
       {:name "hoof trim" :species-rule :equine-only :days-delay 0}
@@ -67,6 +67,10 @@
   (let [days-delay 90]
     (procedure?> :species-rule :bovine-only :days-delay days-delay) => ["superovulation"]))
 
+(fact "can use a map argument instead of a list of key-values"
+  (procedure?> {:species-rule :bovine-only}) => ["superovulation"])
+  
+
 (l/defrel species-breakdown?? :rule        :species)
 (l/fact   species-breakdown?? :bovine-only :bovine) 
 (l/fact   species-breakdown?? :equine-only :equine) 
@@ -80,3 +84,5 @@
 
 (fact "did-selectors work with derived relations"
   (procedure?> :species :bovine) => (just "superovulation" "physical exam" :in-any-order))
+
+;;;                             Tuple-returning Selectors
