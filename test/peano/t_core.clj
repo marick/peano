@@ -67,3 +67,16 @@
   (let [days-delay 90]
     (procedure?> :species-rule :bovine-only :days-delay days-delay) => ["superovulation"]))
 
+(l/defrel species-breakdown?? :rule        :species)
+(l/fact   species-breakdown?? :bovine-only :bovine) 
+(l/fact   species-breakdown?? :equine-only :equine) 
+(l/fact   species-breakdown?? :all         :bovine) 
+(l/fact   species-breakdown?? :all         :equine) 
+
+(defn procedure-species?? [name species]
+  (l/fresh [species-rule]
+           (procedure-species-rule?? name species-rule)
+           (species-breakdown?? species-rule species)))
+
+(fact "did-selectors work with derived relations"
+  (procedure?> :species :bovine) => (just "superovulation" "physical exam" :in-any-order))
