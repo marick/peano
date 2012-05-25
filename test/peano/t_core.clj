@@ -85,4 +85,5 @@
 (fact "did-selectors work with derived relations"
   (procedure?> :species :bovine) => (just "superovulation" "physical exam" :in-any-order))
 
-;;;                             Tuple-returning Selectors
+(fact "can limit the number of returned dids"
+  (procedure?> 1 :species :bovine) => #(some #{%} [["superovulation"] ["physical exam"]]))
