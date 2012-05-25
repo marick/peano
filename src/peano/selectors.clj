@@ -20,6 +20,13 @@
        (generate-run-form base-relation (rest kvs) (first kvs))
        (generate-run-form base-relation kvs false))))
 
+(defn generate-one-form [base-relation kvs]
+  `(first ~(generate-run-form base-relation kvs 1)))
+
 (defn make-did-selector* [base-relation]
-  `(defmacro ~(selector-symbol base-relation) [& kvs#]
-     (generate-run-form '~base-relation kvs#)))
+  (let [selector (selector-symbol base-relation)]
+    `(do
+       (defmacro ~selector [& kvs#]
+         (generate-run-form '~base-relation kvs#))
+       (defmacro ~(one-selector-symbol base-relation) [& kvs#]
+         (generate-one-form '~base-relation kvs#)))))

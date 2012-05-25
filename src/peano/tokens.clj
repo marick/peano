@@ -10,9 +10,11 @@
   ([prefix-symbol suffix-key]
      (query-symbol (str (name prefix-symbol) "-" (name suffix-key)))))
 
-(defn selector-symbol
-  ([symbol-or-string]
-     (symbol-maker symbol-or-string "?>")))
+(defn selector-symbol [symbol-or-string]
+  (symbol-maker symbol-or-string "?>"))
+
+(defn one-selector-symbol [symbol-or-string]
+  (selector-symbol (str "one-" (name symbol-or-string))))
 
 (defn typelike-symbol [key]
   ;; Why can I not create a symbol from a key?

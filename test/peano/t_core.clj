@@ -87,3 +87,7 @@
 
 (fact "can limit the number of returned dids"
   (procedure?> 1 :species :bovine) => #(some #{%} [["superovulation"] ["physical exam"]]))
+
+(fact "there's a convenience function that returns a single did"
+  (one-procedure?> :species :bovine) => #(some #{%} ["superovulation" "physical exam"]))
+  
