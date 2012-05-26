@@ -9,18 +9,18 @@
 
 ;; -- 
 (defn generate-did-run-form
-  ([run-count base-relation kvs]
+  ([run-count relation kvs]
      (let [q (gensym "q")
            pairs (pairify-arglist kvs)
-           selector-for-did `(~(query-symbol base-relation) ~q)
+           selector-for-did `(~(query-symbol relation) ~q)
            narrowing-selectors (map (fn [[key value]]
-                                      `( ~(query-symbol base-relation key) ~q ~value))
+                                      `( ~(query-symbol relation key) ~q ~value))
                                     pairs)]
        `(l/run ~run-count [~q] ~selector-for-did ~@narrowing-selectors)))
-  ([base-relation kvs]
+  ([relation kvs]
      (if (number? (first kvs))
-       (generate-did-run-form (first kvs) base-relation (rest kvs))
-       (generate-did-run-form false       base-relation kvs ))))
+       (generate-did-run-form (first kvs) relation (rest kvs))
+       (generate-did-run-form false       relation kvs ))))
 
 (defn generate-seq-run-form
   ([run-count relation kvs keys]
@@ -40,20 +40,20 @@
        (generate-seq-run-form false       relation kvs        keys))))
 
 ;;- 
-(defn generate-one-did-form [base-relation kvs]
-  `(first ~(generate-did-run-form 1 base-relation kvs)))
+(defn generate-one-did-form [relation kvs]
+  `(first ~(generate-did-run-form 1 relation kvs)))
 
 (defn generate-one-seq-form [relation keys kvs]
   `(first ~(generate-seq-run-form 1 relation keys kvs)))
 
 ;; -
-(defn make-did-selector* [base-relation]
-  (let [selector (selector-symbol base-relation)]
+(defn make-did-selector* [relation]
+  (let [selector (selector-symbol relation)]
     `(do
        (defmacro ~selector [& kvs#]
-         (generate-did-run-form '~base-relation kvs#))
-       (defmacro ~(one-selector-symbol base-relation) [& kvs#]
-         (generate-one-did-form '~base-relation kvs#)))))
+         (generate-did-run-form '~relation kvs#))
+       (defmacro ~(one-selector-symbol relation) [& kvs#]
+         (generate-one-did-form '~relation kvs#)))))
 
 (defn make-seq-selector* [relation keys]
   (let [relation (canonicalize-relation relation)
