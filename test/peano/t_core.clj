@@ -101,3 +101,24 @@
 
 (fact "selectors can be created"
   (selector-me?> :foo 1) => ["bess"])
+
+
+;;;                             Seq selectors
+
+(defn permitted?? [procedure animal]
+  (l/fresh [species]
+         (animal-species?? animal species)
+         (procedure-species?? procedure species)))
+
+(make-seq-selector permitted?? :procedure :animal)
+
+(fact "a selector that returns seqs is created"
+  (permitted?>) => (contains (just ["hoof trim" "hank"]))
+  (count (permitted?>)) => 4
+  (count (permitted?> 1)) => 1
+  (permitted?> :animal "hank") => (just ["hoof trim" "hank"] ["physical exam" "hank"]
+                                        :in-any-order)
+  (permitted?> :animal "hank" :procedure "physical exam") => [["physical exam" "hank"]]
+  (one-permitted?> :animal "hank" :procedure "physical exam") => ["physical exam" "hank"])
+
+
