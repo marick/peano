@@ -19,7 +19,3 @@
 (fact "can make the data-accessor-by-name form"
   (animal-data "bess") => {:name "bess", :hooves 4})
 
-
-(data* '[three-args :by :name]            
-       '[{:name "bess", :foo 1 :bar 2}])
-

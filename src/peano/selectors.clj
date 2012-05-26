@@ -1,7 +1,6 @@
 (ns peano.selectors
   (:require [clojure.core.logic :as l])
-  (:use peano.tokens
-        peano.data))
+  (:use peano.tokens))
 
 
 (defn generate-run-form

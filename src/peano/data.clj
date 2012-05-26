@@ -1,6 +1,7 @@
 (ns peano.data
   (:require [clojure.core.logic :as l])
-  (:use peano.tokens))
+  (:use peano.tokens
+        [peano.selectors :only [make-did-selector*]]))
 
 (defn to-make-did-relation [name-in-query-form did-key]
   `(l/defrel ~name-in-query-form ~did-key))
@@ -47,12 +48,15 @@
 
 (defn data* [did-description instances]
   (let [prefix (first did-description)
-        did-key (last did-description)
+        did-key (nth did-description 2)
         all-keys (keys (first instances))
         did-do-form (did-do-form prefix did-key instances)
+        selector-definitions (if (> (count did-description) 3)
+                               (make-did-selector* prefix))
         remaining-forms (map (fn [other-key]
                                (binary-do-form prefix did-key other-key instances))
                              all-keys)]
     `(do ~did-do-form
          ~@remaining-forms
-         ~(data-accessor prefix did-key instances))))
+         ~(data-accessor prefix did-key instances)
+         ~selector-definitions)))

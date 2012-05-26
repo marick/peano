@@ -91,3 +91,13 @@
 (fact "there's a convenience function that returns a single did"
   (one-procedure?> :species :bovine) => #(some #{%} ["superovulation" "physical exam"]))
   
+
+
+
+;;; Creating selectors with data statements
+
+(data [selector-me :by :name :with-selectors]
+      {:name "bess", :foo 1, :bar 2})
+
+(fact "selectors can be created"
+  (selector-me?> :foo 1) => ["bess"])
