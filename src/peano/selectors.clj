@@ -7,7 +7,11 @@
     (into [] (first flat-seq-or-seqed-map))
     (partition 2 flat-seq-or-seqed-map)))
 
-;; -- 
+;; --
+
+;; TODO: These `generate` functions are similar enough that an
+;; abstraction should be abstracted from them. 
+
 (defn generate-did-run-form
   ([run-count relation kvs]
      (let [q (gensym "q")
