@@ -9,7 +9,7 @@
 
 ;; -- 
 (defn generate-did-run-form
-  ([base-relation kvs run-count]
+  ([run-count base-relation kvs]
      (let [q (gensym "q")
            pairs (pairify-arglist kvs)
            selector-for-did `(~(query-symbol base-relation) ~q)
@@ -19,11 +19,11 @@
        `(l/run ~run-count [~q] ~selector-for-did ~@narrowing-selectors)))
   ([base-relation kvs]
      (if (number? (first kvs))
-       (generate-did-run-form base-relation (rest kvs) (first kvs))
-       (generate-did-run-form base-relation kvs false))))
+       (generate-did-run-form (first kvs) base-relation (rest kvs))
+       (generate-did-run-form false       base-relation kvs ))))
 
 (defn generate-seq-run-form
-  ([relation keys kvs run-count]
+  ([run-count relation kvs keys]
      (let [q (gensym "q")
            pairs (pairify-arglist kvs)
            selector-for-result `(l/== [~@(keys-to-lvars keys)] ~q)
@@ -34,17 +34,17 @@
        `(l/run ~run-count [~q]
                (l/fresh [~@(keys-to-lvars keys)]
                         ~selector-for-result ~relation-query ~@narrowing-selectors))))
-  ([relation keys kvs]
+  ([relation kvs keys]
      (if (number? (first kvs))
-       (generate-seq-run-form relation keys (rest kvs) (first kvs))
-       (generate-seq-run-form relation keys kvs false))))
+       (generate-seq-run-form (first kvs) relation (rest kvs) keys)
+       (generate-seq-run-form false       relation kvs        keys))))
 
 ;;- 
 (defn generate-one-did-form [base-relation kvs]
-  `(first ~(generate-did-run-form base-relation kvs 1)))
+  `(first ~(generate-did-run-form 1 base-relation kvs)))
 
 (defn generate-one-seq-form [relation keys kvs]
-  `(first ~(generate-seq-run-form relation keys kvs 1)))
+  `(first ~(generate-seq-run-form 1 relation keys kvs)))
 
 ;; -
 (defn make-did-selector* [base-relation]
@@ -60,8 +60,8 @@
         selector (selector-symbol relation)]
     `(do
        (defmacro ~selector [& kvs#]
-         (generate-seq-run-form '~relation '~keys kvs#))
+         (generate-seq-run-form '~relation kvs# '~keys))
        (defmacro ~(one-selector-symbol relation) [& kvs#]
-         (generate-one-seq-form '~relation '~keys kvs#)))))
+         (generate-one-seq-form '~relation kvs# '~keys)))))
 
     
