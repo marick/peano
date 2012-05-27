@@ -1,10 +1,10 @@
-(ns peano.t-blank-filler
+(ns peano.t-guidance
   (:require [clojure.core.logic :as l]
             [clojure.zip :as zip])
   (:use midje.sweet
         [clojure.set :only [difference]]
         clojure.pprint
-        peano.blank-filler))
+        peano.guidance))
 
 (fact "you can make sure a map contains a starting value for a key"
   (with-guaranteed-key {} :key :value) => {:key :value}
@@ -43,15 +43,6 @@
 
 (fact "narrowers can be added into the guidance"
   (with-narrower {:key 1} '(a narrower)) => {:key 1, :narrowers '[(a narrower)]})
-
-
-(fact "there is a default way of classifying leaf nodes"
-  (default-classification '-) => :unconstrained-blank
-  (default-classification 'other-symbol) => :presupplied-lvar
-  (default-classification "string") => :blank-that-identifies
-  (default-classification {:species :bovine}) => :blank-with-properties
-  (default-classification '(something else)) => nil)
-
 
 
 

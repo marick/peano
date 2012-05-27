@@ -1,4 +1,4 @@
-(ns peano.blank-filler
+(ns peano.guidance
   (:require [clojure.core.logic :as l])
   (:use peano.tokens))
 
@@ -13,9 +13,6 @@
   (-> associative
       (with-guaranteed-key key)
       ((partial merge-with conj) {key value})))
-
-(defn one-of-three-blanks? [form]
-  (not-every? false? (for [check [symbol? string? map?]] (check form))))
 
 (defn with-lvar [guidance lvar]
   ; Todo: use the ordered jar
@@ -39,12 +36,6 @@
 (defn with-narrower [guidance narrower]
   (assoc-into-vector guidance :narrowers narrower))
 
-(defn default-classification [form]
-  (cond (= '- form) :unconstrained-blank
-        (string? form) :blank-that-identifies
-        (symbol? form) :presupplied-lvar
-        (map? form) :blank-with-properties))
-        
 
 (comment 
 
