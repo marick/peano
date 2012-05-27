@@ -1,10 +1,52 @@
-(ns peano.t-blank-filler-manual
-  (:require [clojure.core.logic :as l]
-            [clojure.zip :as zip])
-  (:use midje.sweet
-        [clojure.set :only [difference]]
-        clojure.pprint
-        peano.core))
+(ns peano.blank-filler
+  (:require [clojure.core.logic :as l])
+  (:use peano.tokens))
+
+(defn with-guaranteed-key
+  ([associative key starting-value]
+     (merge-with (fn[x,_]x) associative {key starting-value}))
+  ([associative key]
+     (with-guaranteed-key associative key [])))
+                                   
+
+(defn assoc-into-vector [associative key value]
+  (-> associative
+      (with-guaranteed-key key)
+      ((partial merge-with conj) {key value})))
+
+(defn one-of-three-blanks? [form]
+  (not-every? false? (for [check [symbol? string? map?]] (check form))))
+
+(defn with-lvar [guidance lvar]
+  ; Todo: use the ordered jar
+  (if (some #{lvar} (:lvars-needed guidance))
+    guidance
+    (assoc-into-vector guidance :lvars-needed lvar)))
+
+(defn with-new-lvar [guidance identifier]
+  (let [where [:lvars identifier :counts]
+        current-count (get-in guidance where 0)
+        new-symbol (symbol (str (name identifier) "-" current-count))]
+    (vector 
+     (-> guidance
+         (assoc-in where (inc current-count))
+         (with-lvar new-symbol))
+     new-symbol)))
+
+(defn property-narrower [[relation property] lvar required-value]
+  `(l/== (~(query-symbol relation property) ~lvar ~required-value)))
+
+(defn with-narrower [guidance narrower]
+  (assoc-into-vector guidance :narrowers narrower))
+
+(defn default-classification [form]
+  (cond (= '- form) :unconstrained-blank
+        (string? form) :blank-that-identifies
+        (symbol? form) :presupplied-lvar
+        (map? form) :blank-with-properties))
+        
+
+(comment 
 
 (defn fill-in-one-blank [accumulator vertical-position horizontal-position]
   (let [replacements-for-position ((accumulator :counts) horizontal-position)
@@ -58,30 +100,6 @@
 (def guidance {:names ["animal" "procedure"]
                :counts [0 0]}) 
 
-(fact "trivial case produces no change"
-  (fill-in-the-blanks '[] guidance)
-  => (contains {:filled-in []}))
-
-(fact "dashes describe blanks to be filled in"
-  (fill-in-the-blanks '[-] guidance)
-  => (contains {:filled-in ["animal-0"], :logic-vars-needed ["animal-0"]})
-
-  (fill-in-the-blanks '[[- -] [- -]] guidance)
-  => (contains {:filled-in [["animal-0" "procedure-0"] ["animal-1" "procedure-1"]],
-                :logic-vars-needed ["animal-0" "procedure-0" "animal-1" "procedure-1"]}))
-
-
-(fact "logical variables can be specified"
-  (fill-in-the-blanks '[- b] guidance)
-  => (contains {:filled-in '["animal-0" b]
-                :logic-vars-needed '["animal-0" b]}))
-
-(fact "strings name the 'did' of a generated variable, thus restricting it"
-  (fill-in-the-blanks '["hank" b] guidance)
-  => (contains {:filled-in '["animal-0" b]
-                :logic-vars-needed '["animal-0" b]
-                :extra-restrictions '["hank"]}))
-
 (defn build-run* [reservation ab-pair extra-clauses]
   (let [body `( (l/== (cons :reservation ~reservation) ~'q)
                 (permitted?? ~@ab-pair)
@@ -98,3 +116,4 @@
     (build-run* constructed-reservation logic-vars
                 (concat manual-extra-clauses extra-clauses-from-reservation))))
 
+)
