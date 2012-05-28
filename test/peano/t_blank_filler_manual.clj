@@ -3,8 +3,7 @@
             [clojure.zip :as zip])
   (:use midje.sweet
         [clojure.set :only [difference]]
-        clojure.pprint
-        peano.core))
+        clojure.pprint))
 
 (defn fill-in-one-blank [accumulator vertical-position horizontal-position]
   (let [replacements-for-position ((accumulator :counts) horizontal-position)

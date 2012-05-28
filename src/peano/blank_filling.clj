@@ -1,26 +1,23 @@
 (ns peano.blank-filling
-  (:require [clojure.core.logic :as l]
-            [clojure.zip :as zip])
+  (:require [clojure.zip :as zip])
   (:use peano.tokens))
 
-(defn fill-in-the-blanks [guidance vector-structure]
-  (loop [guidance guidance
-         loc (zip/vector-zip vector-structure)]
-    (cond (zip/end? loc)
-          ( (:postprocessing guidance) guidance (zip/root loc))
+(defn fill-in-the-zipper [guidance loc]
+  (cond (zip/end? loc)
+        ( (:postprocessing guidance) guidance (zip/root loc))
 
-          (zip/branch? loc)
-          (recur guidance (zip/next loc))
+        (zip/branch? loc)
+        (recur guidance (zip/next loc))
 
-          ( (:classification guidance) (zip/node loc))
-          (let [[guidance lvar] ( (:process-blank guidance)
-                                  guidance (zip/node loc)
-                                  (dec (count (zip/path loc))) (count (zip/lefts loc)))]
-            (recur guidance
-                   (zip/next (zip/replace loc lvar))))
+        ( (:classification guidance) (zip/node loc))
+        (let [[guidance lvar] ( (:process-blank guidance)
+                                guidance (zip/node loc)
+                                (dec (count (zip/path loc))) (count (zip/lefts loc)))]
+          (recur guidance
+                 (zip/next (zip/replace loc lvar))))
 
-          :else
-          (recur guidance (zip/next loc)))))
+        :else
+        (recur guidance (zip/next loc))))
 
 (defn suggested-classification [form]
   (cond (= '- form) :unconstrained-blank

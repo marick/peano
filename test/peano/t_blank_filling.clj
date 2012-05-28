@@ -2,15 +2,8 @@
   (:require [clojure.core.logic :as l])
   (:use midje.sweet
         clojure.pprint
+        peano.core
         peano.blank-filling))
-
-(unfinished g)
-(defn f [n] (g {:a 'complicated :f odd?} n))
-
-(fact
-  (f 1) => 1
-  (provided
-    (g anything 1) => 1))
 
 (unfinished classification work-with-blank postprocessing)
 
