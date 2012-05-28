@@ -17,7 +17,7 @@
                                   guidance (zip/node loc)
                                   (dec (count (zip/path loc))) (count (zip/lefts loc)))]
             (recur guidance
-                   (zip/replace loc lvar)))
+                   (zip/next (zip/replace loc lvar))))
 
           :else
           (recur guidance (zip/next loc)))))

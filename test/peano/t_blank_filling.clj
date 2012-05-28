@@ -19,20 +19,38 @@
                :postprocessing #'postprocessing})
 
 (fact "trivial case"
-  (fill-in-the-blanks guidance '[]) => irrelevant
+  (fill-in-the-blanks guidance '[]) => ...final-result...
   (provided
     (classification anything) => irrelevant :times 0 
     (work-with-blank guidance ...blank... ...levels-above... ...count-to-left...) => irrelevant :times 0
-    (postprocessing guidance anything) => anything))
+    (postprocessing guidance anything) => ...final-result...))
   
 
 (fact "no blanks to fill"
-  (fill-in-the-blanks guidance '[[:m]]) => irrelevant
+  (fill-in-the-blanks guidance '[[:m]]) => ...final-result...
   (provided
-    (classification :mm) => nil
+    (classification :m) => nil
     (work-with-blank guidance ...blank... ...levels-above... ...count-to-left...) => irrelevant :times 0
-    (postprocessing guidance '[[:m]]) => anything))
+    (postprocessing guidance '[[:m]]) => ...final-result...))
   
+
+(fact "a blank"
+  (fill-in-the-blanks guidance '[_]) => ...final-result...
+  (provided
+    (classification '_) => :not-nil
+    (work-with-blank guidance '_ 0 0) => [(assoc guidance :some :change) 'lvar]
+    (postprocessing (contains {:some :change}) '[lvar]) => ...final-result...))
+
+
+(fact "locations are reported correctly"
+  (fill-in-the-blanks guidance '[[_ [_ _]]]) => ...final-result...
+  (provided
+    (classification '_) => :not-nil
+    (work-with-blank anything '_ 1 0) => [guidance 'lvar1]
+    (work-with-blank anything '_ 2 0) => [guidance 'lvar1]
+    (work-with-blank anything '_ 2 1) => [guidance 'lvar1]
+    (postprocessing anything anything) => ...final-result...))
+
 
 
 
