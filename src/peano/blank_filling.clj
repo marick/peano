@@ -4,13 +4,13 @@
 
 (defn fill-in-the-zipper [guidance loc]
   (cond (zip/end? loc)
-        ( (:postprocessing guidance) guidance (zip/root loc))
+        ( (:postprocessor guidance) guidance (zip/root loc))
 
         (zip/branch? loc)
         (recur guidance (zip/next loc))
 
-        ( (:classification guidance) (zip/node loc))
-        (let [[guidance lvar] ( (:process-blank guidance)
+        ( (:classifier guidance) (zip/node loc))
+        (let [[guidance lvar] ( (:processor guidance)
                                 guidance (zip/node loc)
                                 (dec (count (zip/path loc))) (count (zip/lefts loc)))]
           (recur guidance
@@ -19,7 +19,7 @@
         :else
         (recur guidance (zip/next loc))))
 
-(defn suggested-classification [form]
+(defn suggested-classifier [form]
   (cond (= '- form) :unconstrained-blank
         (string? form) :blank-that-identifies
         (symbol? form) :presupplied-lvar
