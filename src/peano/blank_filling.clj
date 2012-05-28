@@ -22,6 +22,14 @@
           :else
           (recur guidance (zip/next loc)))))
 
+(defn suggested-classification [form]
+  (cond (= '- form) :unconstrained-blank
+        (string? form) :blank-that-identifies
+        (symbol? form) :presupplied-lvar
+        (map? form) :blank-with-properties))
+
+
+
 (comment 
 
 (defn fill-in-one-blank [accumulator vertical-position horizontal-position]

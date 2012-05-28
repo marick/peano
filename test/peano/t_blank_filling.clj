@@ -52,6 +52,13 @@
     (postprocessing anything anything) => ...final-result...))
 
 
+(fact "there is a suggested way of classifying leaf nodes"
+  (suggested-classification '-) => :unconstrained-blank
+  (suggested-classification 'other-symbol) => :presupplied-lvar
+  (suggested-classification "string") => :blank-that-identifies
+  (suggested-classification {:species :bovine}) => :blank-with-properties
+  (suggested-classification '(something else)) => nil)
+
 
 
 (comment
