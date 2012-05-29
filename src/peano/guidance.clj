@@ -30,8 +30,11 @@
          (with-lvar new-symbol))
      new-symbol)))
 
+(defn typecast-lvar [lvar relation]
+  `(~(query-symbol relation) ~lvar))
+
 (defn property-narrower [[relation property] lvar required-value]
-  `(l/== (~(query-symbol relation property) ~lvar ~required-value)))
+  `(~(query-symbol relation property) ~lvar ~required-value))
 
 (defn with-narrower [guidance narrower]
   (assoc-into-vector guidance :narrowers narrower))

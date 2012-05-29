@@ -39,10 +39,12 @@
 
 (fact "you can write a logic clause that forces an lvar to associate with a property"
   (property-narrower [:animal :name] 'animal-0 "bessy")
-  => '(clojure.core.logic/== (animal-name?? animal-0 "bessy")))
+  => '(animal-name?? animal-0 "bessy"))
 
 (fact "narrowers can be added into the guidance"
   (with-narrower {:key 1} '(a narrower)) => {:key 1, :narrowers '[(a narrower)]})
 
-
+(fact "you can 'typecast' a variable to a relation"
+  (typecast-lvar 'animal-0 :animal)
+  => '(animal?? animal-0))
 

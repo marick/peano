@@ -2,9 +2,10 @@
   (:require [clojure.core.logic :as l])
   (:use midje.sweet
         clojure.pprint
+        [clojure.math.combinatorics :only [combinations]]
         peano.core
         peano.guidance
-        [peano.blank-filling :only [suggested-classifier]]))
+        [peano.blank-filling :only [suggested-classifier generate-run-form]]))
 
 (defmulti processor
   (fn [guidance blank & _] ((:classifier guidance) blank)))
@@ -42,11 +43,35 @@
 
 (defn simplify-and-process [guidance blank _ count-to-left]
   (processor guidance blank
-                   (if (= 0 count-to-left) :procedure :animal)))
+             (if (= 0 count-to-left) :procedure :animal)))
+
+(defn permitted-pairs-narrowers [guidance]
+  (map (fn [procedure animal] `(permitted?? ~procedure ~animal))
+       (guidance :procedure)
+       (guidance :animal)))
+
+(defn no-duplicate-groups-narrowers [uses]
+  (map (fn [[one two]] `(l/!= ~one ~two))
+       (combinations uses 2)))
+
+(fact "remove duplicate groups"
+  (no-duplicate-groups-narrowers [ [1 1] ]) => []
+  (no-duplicate-groups-narrowers [ [1 1] [2 2] [3 3]])
+  => (just '(clojure.core.logic/!= [1 1] [2 2])
+           '(clojure.core.logic/!= [1 1] [3 3])
+           '(clojure.core.logic/!= [2 2] [3 3])
+           :in-any-order))
+
+(defn postprocessor [guidance tree]
+  (let [narrowers (concat (permitted-pairs-narrowers guidance)
+                          (no-duplicate-groups-narrowers tree))
+        ]
+    (vector (merge-with concat guidance {:narrowers narrowers})
+            tree)))
 
 (def guidance {:classifier suggested-classifier
                :processor simplify-and-process
-               :postprocessor (fn [x y] [x y])})
+               :postprocessor postprocessor})
 
 ;;; About processing
 
@@ -94,4 +119,36 @@
                                :narrowers [narrower]})))
   
   
-(prn (fill-in-the-blanks guidance '[[_ "hank"] [myproc {:legs 4}]]))
+
+(data [animal :by :name]
+      {:name "betty" :species :bovine :legs 4}
+      {:name "julie" :species :bovine :legs 4}
+      {:name "jeff" :species :equine :legs 4}
+      {:name "hank" :species :equine :legs 3}) ; poor hank
+
+(data [procedure :by :name]
+      {:name "hoof trim" :species :equine :days-delay 0}
+      {:name "casting teeth" :species :equine :days-delay 0}
+      {:name "superovulation" :species :bovine :days-delay 90})
+
+(defn permitted?? [procedure animal]
+  (l/fresh [species]
+         (procedure-species?? procedure species)
+         (animal-species?? animal species)))
+
+(defmacro reservations [& tree]
+  (apply generate-run-form (fill-in-the-blanks guidance (vec tree))))
+
+(println "============== SIMPLE")
+(pprint (reservations [- -]))
+
+
+(println "============== BIG")
+(pprint (reservations [- "hank"] [- {:legs 3}]))
+
+
+
+
+; (pprint (apply generate-run-form (fill-in-the-blanks guidance '[[- "hank"] [- {:legs 3}]])))
+  
+

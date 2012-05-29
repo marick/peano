@@ -25,6 +25,13 @@
         (symbol? form) :presupplied-lvar
         (map? form) :blank-with-properties))
 
+(defn generate-run-form
+  ([guidance tree]
+     (let [q (gensym "q")]
+       `(l/run false [~q]
+               (l/fresh [~@(guidance :lvars-needed)]
+                        (l/== ~tree ~q)
+                        ~@(guidance :narrowers))))))
 
 
 (comment 

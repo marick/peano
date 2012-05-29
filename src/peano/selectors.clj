@@ -10,7 +10,8 @@
 ;; --
 
 ;; TODO: These `generate` functions are similar enough that an
-;; abstraction should be abstracted from them. 
+;; abstraction should be abstracted from them. See also
+;; `generate-run-form` in blank-filling.
 
 (defn generate-did-run-form
   ([run-count relation kvs]
