@@ -5,6 +5,7 @@
         [clojure.math.combinatorics :only [combinations]]
         peano.core
         peano.guidance
+        peano.tokens
         [peano.blank-filling :only [suggested-classifier generate-run-form]]))
 
 (defmulti processor
@@ -120,13 +121,13 @@
   
   
 
-(data [animal :by :name]
+(data [animal :by :name :make-selectors]
       {:name "betty" :species :bovine :legs 4}
       {:name "julie" :species :bovine :legs 4}
       {:name "jeff" :species :equine :legs 4}
       {:name "hank" :species :equine :legs 3}) ; poor hank
 
-(data [procedure :by :name]
+(data [procedure :by :name :make-selectors]
       {:name "hoof trim" :species :equine :days-delay 0}
       {:name "casting teeth" :species :equine :days-delay 0}
       {:name "superovulation" :species :bovine :days-delay 90})
@@ -136,29 +137,42 @@
          (procedure-species?? procedure species)
          (animal-species?? animal species)))
 
-(defn- reservations*
-  ([run-count tree]
+(defn generate-forest-filler-run-form
+  ([run-count guidance tree]
      (apply (partial generate-run-form run-count)
             (fill-in-the-blanks guidance (vec tree))))
-  ([tree]
+  ([guidance tree]
      (if (number? (first tree))
-       (reservations* (first tree) (rest tree))
-       (reservations* false tree))))
+       (generate-forest-filler-run-form (first tree) guidance (rest tree))
+       (generate-forest-filler-run-form false        guidance tree ))))
 
-(defmacro reservations [& tree] (reservations* tree))
+(defn generate-one-forest-filler-form [guidance tree]
+  `(first ~(generate-forest-filler-run-form 1 guidance tree)))
   
+(defn def-forest-fillers* [basename guidance]
+  (let [selector (selector-symbol basename)]
+    `(do
+       (defmacro ~selector [& tree#]
+         (generate-forest-filler-run-form guidance tree#))
+       (defmacro ~(one-selector-symbol basename) [& tree#]
+         (generate-one-forest-filler-form guidance tree#)))))
+
+(defmacro def-forest-fillers [basename guidance]
+  (def-forest-fillers* basename guidance))
+
+(def-forest-fillers reservation guidance)
 
 (fact "simple ones" 
   ;; (println "============== SIMPLE")
   ;; (pprint (reservations [- -] [- -] [- -]))
-  (let [result (reservations [- -] [- -] [- -])]
+  (let [result (reservation?> [- -] [- -] [- -])]
     (> (count result) 20) => truthy
     result => (contains [[["julie" "superovulation"] ["hank" "hoof trim"] ["betty" "superovulation"]]])))
   
 (fact "more complex ones" 
   ;; (println "============== BIG")
-  ;; (pprint (reservations ["hank" -] [{:species :bovine} -]))
-  (let [result (reservations ["hank" -] [{:species :bovine} -])]
+  ;; (pprint (reservation?> ["hank" -] [{:species :bovine} -]))
+  (let [result (reservation?> ["hank" -] [{:species :bovine} -])]
     (count result) => 4
     result => (just [[["hank" "casting teeth"] ["betty" "superovulation"]]
                      [["hank" "hoof trim"] ["betty" "superovulation"]]
@@ -167,7 +181,15 @@
                     :in-any-order)))
 
 (fact "can limit count"
-  (let [result (reservations 2 ["hank" -] [{:species :bovine} -])]
+  (let [result (reservation?> 2 ["hank" -] [{:species :bovine} -])]
     (count result) => 2))
 
-
+(fact "there is a 'one' macro"
+  (let [[[animal0 procedure0] [animal1 procedure1]]
+        (one-reservation?> ["hank" -] [{:species :bovine} -])]
+    (some #{animal0} (animal?>)) => truthy
+    (some #{procedure0} (procedure?>)) => truthy
+    (some #{animal1} (animal?>)) => truthy
+    (some #{procedure1} (procedure?>)) => truthy))
+  
+(pprint (reservation?> ["hank" -] [{:species :bovine} -]))
