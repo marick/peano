@@ -51,34 +51,3 @@
   (suggested-classifier "string") => :blank-that-identifies
   (suggested-classifier {:species :bovine}) => :blank-with-properties
   (suggested-classifier '(something else)) => nil)
-
-
-
-
-(comment
-  
-(fact "trivial case produces no change"
-  (fill-in-the-blanks '[] guidance)
-  => (contains {:filled-in []}))
-
-(fact "dashes describe blanks to be filled in"
-  (fill-in-the-blanks '[-] guidance)
-  => (contains {:filled-in ["animal-0"], :logic-vars-needed ["animal-0"]})
-
-  (fill-in-the-blanks '[[- -] [- -]] guidance)
-  => (contains {:filled-in [["animal-0" "procedure-0"] ["animal-1" "procedure-1"]],
-                :logic-vars-needed ["animal-0" "procedure-0" "animal-1" "procedure-1"]}))
-
-
-(fact "logical variables can be specified"
-  (fill-in-the-blanks '[- b] guidance)
-  => (contains {:filled-in '["animal-0" b]
-                :logic-vars-needed '["animal-0" b]}))
-
-(fact "strings name the 'did' of a generated variable, thus restricting it"
-  (fill-in-the-blanks '["hank" b] guidance)
-  => (contains {:filled-in '["animal-0" b]
-                :logic-vars-needed '["animal-0" b]
-                :extra-restrictions '["hank"]}))
-
-)

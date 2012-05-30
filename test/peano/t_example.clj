@@ -47,25 +47,3 @@
 (fact "More importantly, the selectors work too"
   (procedure?> :species :bovine)
   => (just "physical exam" "superovulation" :in-any-order))
-
-
-;;; Partially working: Test generation of this sort
-
-(future-fact "dashes describe blanks to be filled in"
-  (fill-in-the-blanks '[[- -] [- -]] guidance)
-  => (contains {:filled-in [["animal-0" "procedure-0"]
-                            ["animal-1" "procedure-1"]]}))
-
-;; Note that the pairs are constrained to use procedures
-;; permitted for that particular animal (via the unshown `guidance`
-;; map and, currently, too much hardcoding).
-
-(future-fact "Additional constraints can be added by making the blanks
-              less blank-like"
-  (fill-in-the-blanks '[["hank" -] [{:species :bovine} -]] guidance)
-  => (contains {:filled-in '[["hank" "hoof trim"] ["betty" "physical exam"]]}))
-
-
-
-
-

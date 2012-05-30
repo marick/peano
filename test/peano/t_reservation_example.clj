@@ -192,4 +192,4 @@
     (some #{animal1} (animal?>)) => truthy
     (some #{procedure1} (procedure?>)) => truthy))
   
-(pprint (reservation?> ["hank" -] [{:species :bovine} -]))
+;; (pprint (reservation?> ["hank" -] [{:species :bovine} -]))
