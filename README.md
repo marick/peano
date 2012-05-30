@@ -1,7 +1,9 @@
 The goal of this project is to make it as easy as possible
 to construct test data, including hierarchical data with
-constraints on which datum X can be used with which datum
+constraints on how datum X can be used with datum
 Y. 
+
+[[User documentation|https://github.com/marick/peano/wiki]]
 
 ## Easy lookup of named tabular data
 
@@ -25,17 +27,11 @@ easily ask for the names of data that satisfy constraints.
 
 ```clojure
   (animal?> :legs 4) ;; ["betty" "hank"]
-  (one-procedure?> {:days-delay 0}) ;; "hoof trim"
+  (one-procedure?> :days-delay 0) ;; "hoof trim"
 ```
 
 Once you have names, you can use the tables to populate a
-database or whatever:
-
-```clojure
-  (populate-test-database (animal-data (one-animal?>)))
-```
-
-This part works.
+database or whatever.
 
 ## Groups of names that satisfy constraints.
 
@@ -52,37 +48,30 @@ Now we can ask for pairs that are permitted:
 
 ```clojure
 (permitted?>) ;; [["hoof trim", "hank"], ["superovulation" "betty"]], etc.
-
 (one-permitted?> :procedure "hoof trim") ;; ["hoof trim" "hank"], etc.
 ```
-
-Some of this works. I'm undecided on the API. (Should it
-return an array or a map? If you specify a constraint like
-"I want only hoof trims", should "hoof trim" appear in the
-output?
 
 ## Hierarchical data
 
 The app from which these examples are drawn is largely
-about *reservations*, which are sets of *groups*, each of
-which is a particular (permitted) procedure/animal pair. I
+about *reservations*, which contain one or more  (permitted) procedure/animal pairs. I
 want to show a "picture" of the "shape" of reservation I
 want, and then let an engine fill in the blanks.
 
 For example, the most common reservation used in the tests
-(because it's the only easy one to create) is one group with
+is one group with
 one procedure/animal pair. In many many cases, I don't
 actually care which procedure and which animal I use. I want
 to describe it like this:
 
 ```clojure
-[[- -]]
+(reservation?> [- -] [- -])
 ```
 
 ... and get back a data structure something like this:
 
 ```clojure
-[:reservation [[["hoof trim" "hank"]]]]
+([["hank" "hoof trim"] ["betty" "superovulation"]] ...)
 ```
 
 Then a database-population routine (that would look
@@ -91,27 +80,29 @@ reservation from json data) would take over.
 
 Sometimes you'd want constraints. Some of those can be
 expressed in abbreviated form. Suppose I want two pairs, the
-first containing hank and some appropriate procedure, the
+first containing Hank the Horse and some appropriate procedure, the
 second containing a cow. That would look like this:
 
 ```clojure
-[[- "hank"] [- {:species :bovine}]]
+(reservation?>  ["hank" -] [{:species :bovine} -])
 ```
 
-I have a prototype of this working. The big question is can
-it be turned into a [stunted framework](http://www.artima.com/weblogs/viewpost.jsp?thread=8826): one that's not so
+I have a prototype of this working. The big question is
+whether it's a plausible  [stunted framework](http://www.artima.com/weblogs/viewpost.jsp?thread=8826): one that's not so
 universal that it's too hard to learn and too fiddly to work
 with, but that doesn't require so much customization that
 it's not worthwhile?
 
-Another question is: is logic programming too esoteric for
-average people to use?
+Another question: Logic programming is esoteric. The
+framework aims to write *most* of a core.logic query for
+you, but you need to provide some help. Can you use this
+framework without having to be an expert in core.logic?
 
 And: is Clojure a large enough language community? one that
 builds the sort of apps that need sophisticated test data generation?
 
 ## License
 
-Copyright © 2012 FIXME
+Copyright © 2012 Brian Marick
 
 Distributed under the Eclipse Public License, the same as Clojure.
