@@ -19,12 +19,6 @@
         :else
         (recur guidance (zip/next loc))))
 
-(defn suggested-classifier [form]
-  (cond (= '- form) :unconstrained-blank
-        (string? form) :blank-that-identifies
-        (symbol? form) :presupplied-lvar
-        (map? form) :blank-with-properties))
-
 (defn generate-run-form [run-count guidance tree]
   (let [q (gensym "q")]
     `(l/run ~run-count [~q]
@@ -32,4 +26,24 @@
                      (l/== ~tree ~q)
                      ~@(guidance :narrowers)))))
 
+
+(defn generate-forest-filler-run-form
+  ([run-count guidance tree]
+     (apply (partial generate-run-form run-count)
+            (fill-in-the-zipper guidance (clojure.zip/vector-zip (vec tree)))))
+  ([guidance tree]
+     (if (number? (first tree))
+       (generate-forest-filler-run-form (first tree) guidance (rest tree))
+       (generate-forest-filler-run-form false        guidance tree ))))
+
+(defn generate-one-forest-filler-form [guidance tree]
+  `(first ~(generate-forest-filler-run-form 1 guidance tree)))
+  
+(defn def-forest-fillers* [basename guidance]
+  (let [selector (selector-symbol basename)]
+    `(do
+       (defmacro ~selector [& tree#]
+         (generate-forest-filler-run-form ~guidance tree#))
+       (defmacro ~(one-selector-symbol basename) [& tree#]
+         (generate-one-forest-filler-form ~guidance tree#)))))
 
