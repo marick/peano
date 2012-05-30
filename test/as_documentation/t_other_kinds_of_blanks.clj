@@ -4,7 +4,7 @@
         [as-documentation.t-blank-filling
          :only [processor simplify-and-process
                 postprocessor make-and-install-new-lvar-with-properties]]
-        [peano.sweet :only [suggested-classifier def-forest-fillers]]
+        [peano.sweet :only [suggested-classifier make-forest-selector]]
         [peano.guidance :only [with-lvar assoc-into-vector]]
         clojure.pprint))
 
@@ -44,7 +44,7 @@
                :processor simplify-and-process
                :postprocessor postprocessor})
 
-(def-forest-fillers reservation guidance)
+(make-forest-selector reservation guidance)
 
 
 ;; (println "============== Named animal")

@@ -229,14 +229,17 @@
                :processor simplify-and-process
                :postprocessor postprocessor})
 
-;;; A "forest filler" takes a number of vectors with blanks to be
+;;; A "forest selector" takes a number of vectors with blanks to be
 ;;; filled in. It constructs a logic expression that causes the blanks
 ;;; to be filled in with procedure or animal names (as appropriate),
 ;;; runs it, and reports the results.
 ;;;
-;;; (Note: you may be wondering what we did that filled in the blanks with animal names. It's `permitted?`. It associates a logical variable with the first argument of `animal-species??` or `procedure-species??`. That first argument represents a name.
+;;; (Note: you may be wondering what we did that filled in the blanks
+;;; with animal names. It's `permitted?`. It associates a logical
+;;; variable with the first argument of `animal-species??` or
+;;; `procedure-species??`. That first argument represents a name.
 
-(def-forest-fillers reservation guidance)
+(make-forest-selector reservation guidance)
 
 ;; (println "============== Simple")
 ;; (pprint (reservation?> [- -] [- -] [- -]))

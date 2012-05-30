@@ -27,23 +27,23 @@
                      ~@(guidance :narrowers)))))
 
 
-(defn generate-forest-filler-run-form
+(defn generate-forest-selector-run-form
   ([run-count guidance tree]
      (apply (partial generate-run-form run-count)
             (fill-in-the-zipper guidance (clojure.zip/vector-zip (vec tree)))))
   ([guidance tree]
      (if (number? (first tree))
-       (generate-forest-filler-run-form (first tree) guidance (rest tree))
-       (generate-forest-filler-run-form false        guidance tree ))))
+       (generate-forest-selector-run-form (first tree) guidance (rest tree))
+       (generate-forest-selector-run-form false        guidance tree ))))
 
-(defn generate-one-forest-filler-form [guidance tree]
-  `(first ~(generate-forest-filler-run-form 1 guidance tree)))
+(defn generate-one-forest-selector-form [guidance tree]
+  `(first ~(generate-forest-selector-run-form 1 guidance tree)))
   
-(defn def-forest-fillers* [basename guidance]
+(defn make-forest-selector* [basename guidance]
   (let [selector (selector-symbol basename)]
     `(do
        (defmacro ~selector [& tree#]
-         (generate-forest-filler-run-form ~guidance tree#))
+         (generate-forest-selector-run-form ~guidance tree#))
        (defmacro ~(one-selector-symbol basename) [& tree#]
-         (generate-one-forest-filler-form ~guidance tree#)))))
+         (generate-one-forest-selector-form ~guidance tree#)))))
 
