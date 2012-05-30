@@ -3,7 +3,7 @@ to construct test data, including hierarchical data with
 constraints on how datum X can be used with datum
 Y. 
 
-[[User documentation|https://github.com/marick/peano/wiki]]
+(User documentation)[https://github.com/marick/peano/wiki]
 
 ## Easy lookup of named tabular data
 
