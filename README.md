@@ -22,7 +22,7 @@ So, for example, suppose I have animals and medical procedures:
       {:name "physical exam" :species-rule :all :days-delay 0})
 ```
 
-From this, we can auto-construct `selectors` that let us
+From this, we can auto-construct *selectors* that let us
 easily ask for the names of data that satisfy constraints.
 
 ```clojure
