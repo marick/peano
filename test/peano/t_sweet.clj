@@ -1,8 +1,8 @@
-(ns peano.t-core
+(ns peano.t-sweet
   (:require [clojure.core.logic :as l])
   (:use midje.sweet
         clojure.pprint
-        peano.core))
+        peano.sweet))
 
 ;;;                             Constructing data and query functions.
 

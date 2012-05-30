@@ -2,7 +2,7 @@
   (:require [clojure.core.logic :as l])
   (:use midje.sweet
         clojure.pprint
-        peano.core
+        peano.sweet
         peano.blank-filling))
 
 (unfinished classifier work-with-blank postprocessor)

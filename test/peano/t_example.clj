@@ -1,6 +1,6 @@
 (ns peano.t-example
   (:require [clojure.core.logic :as l])
-  (:use midje.sweet peano.core))
+  (:use midje.sweet peano.sweet))
 
 ;;; Feature: Constructing relation and query functions from tabular data
 

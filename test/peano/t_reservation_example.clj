@@ -3,7 +3,7 @@
   (:use midje.sweet
         clojure.pprint
         [clojure.math.combinatorics :only [combinations]]
-        peano.core
+        peano.sweet
         peano.guidance
         peano.tokens
         [peano.blank-filling :only [suggested-classifier generate-run-form]]))

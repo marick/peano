@@ -1,4 +1,4 @@
-(ns peano.core
+(ns peano.sweet
   (:require [clojure.zip])
   (:use [peano.data :only [data*]]
         [peano.selectors :only [make-did-selector* make-seq-selector*]]

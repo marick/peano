@@ -3,7 +3,7 @@
   (:use midje.sweet
         peano.data))
 
-;; The more complete tests are in t-core.
+;; The more complete tests are in t-sweet.
 
 ;; For some reason, this eval doesn't work when run inside a fact.
 (eval (did-do-form 'animal :name [{:name "bess"}]))

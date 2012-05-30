@@ -3,7 +3,7 @@
   (:use midje.sweet
         [clojure.set :only [difference]]
         clojure.pprint
-        peano.core))
+        peano.sweet))
 
 (data [animal :by :name]
       {:name "betty" :species :bovine}
