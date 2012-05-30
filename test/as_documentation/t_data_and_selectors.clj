@@ -1,4 +1,4 @@
-(ns peano.t-example
+(ns as-documentation.t-data-and-selectors
   (:require [clojure.core.logic :as l])
   (:use midje.sweet peano.sweet))
 
