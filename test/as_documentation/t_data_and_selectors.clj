@@ -47,3 +47,23 @@
 (fact "More importantly, the selectors work too"
   (procedure?> :species :bovine)
   => (just "physical exam" "superovulation" :in-any-order))
+
+
+;;; Feature: You can make selectors for relations not modeled after `data`.
+
+
+(defn permitted?? [procedure animal]
+  (l/fresh [species]
+           (procedure-species?? procedure species)
+           (animal-species?? animal species)))
+
+(make-seq-selector permitted?? :procedure :animal)
+
+(fact "can select permitted animals"
+  (permitted?>) => (contains [["hoof trim" "hank"]])
+  (permitted?>) =deny=> (contains [["hoof trim" "betty"]])
+
+  (permitted?> :animal "betty") => (just [["superovulation" "betty"]
+                                          ["physical exam" "betty"]]
+                                          :in-any-order))
+  
